@@ -109,11 +109,11 @@ impl From<RasterIOExtraArg> for GDALRasterIOExtraArg {
         }
     }
 }
-pub struct RasterBandStatisticsResult{
-    min: f64,
-    max: f64,
-    mean: f64,
-    standard_deviation: f64
+pub struct RasterBandStatistics {
+    pub min: f64,
+    pub max: f64,
+    pub mean: f64,
+    pub standard_deviation: f64
 }
 
 /// Represents a single band of a dataset.
@@ -222,8 +222,8 @@ impl<'a> RasterBand<'a> {
 
         Ok(())
     }
-    pub fn get_statistics(&self, approx_ok: bool, force: bool) -> Result<RasterBandStatisticsResult> {
-        let mut result = RasterBandStatisticsResult{
+    pub fn get_statistics(&self, approx_ok: bool, force: bool) -> Result<RasterBandStatistics> {
+        let mut result = RasterBandStatistics {
             min: 0.0,
             max: 0.0,
             mean: 0.0,
