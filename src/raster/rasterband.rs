@@ -109,6 +109,12 @@ impl From<RasterIOExtraArg> for GDALRasterIOExtraArg {
         }
     }
 }
+pub struct RasterBandStatisticsResult{
+    min: f64,
+    max: f64,
+    mean: f64,
+    standard_deviation: f64
+}
 
 /// Represents a single band of a dataset.
 ///
@@ -215,6 +221,30 @@ impl<'a> RasterBand<'a> {
         }
 
         Ok(())
+    }
+    pub fn get_statistics(&self, approx_ok: bool, force: bool) -> Result<RasterBandStatisticsResult> {
+        let mut result = RasterBandStatisticsResult{
+            min: 0.0,
+            max: 0.0,
+            mean: 0.0,
+            standard_deviation: 0.0
+        };
+        let rv = unsafe{
+            gdal_sys::GDALGetRasterStatistics(
+                self.c_rasterband,
+                approx_ok as c_int,
+                force as c_int,
+                &mut result.min as *mut f64,
+                &mut result.max as *mut f64,
+                &mut result.mean as *mut f64,
+                &mut result.standard_deviation as *mut f64,
+            )
+        };
+        if rv != CPLErr::CE_None{
+            return Err(_last_cpl_err(rv));
+        }
+        return Ok(result);
+
     }
 
     /// Read a 'Buffer<T>' from this band. T implements 'GdalType'
