@@ -251,6 +251,7 @@ impl<'a> RasterBand<'a> {
         }
     }
 
+
     pub fn get_statistics(&self, approx_ok: bool, force: bool) -> Result<RasterBandStatistics> {
         let mut result = RasterBandStatistics {
             min: 0.0,

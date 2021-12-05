@@ -270,6 +270,12 @@ impl Dataset {
         Ok(Dataset { c_dataset })
     }
 
+    pub fn flush_cache(&mut self){
+        unsafe{
+            gdal_sys::GDALFlushCache(self.c_dataset)
+        }
+    }
+
     /// Creates a new Dataset by wrapping a C pointer
     ///
     /// # Safety
