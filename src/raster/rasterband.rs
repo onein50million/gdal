@@ -223,13 +223,13 @@ impl<'a> RasterBand<'a> {
         Ok(())
     }
 
-    pub fn fill_no_data(&mut self, mask: Self, max_search_distance: f64, num_smoothing_iterations: i32, options: Vec<&str>) -> Result<()>{
+    pub fn fill_no_data(&mut self, mask: GDALRasterBandH, max_search_distance: f64, num_smoothing_iterations: i32, options: Vec<&str>) -> Result<()>{
         let rv = unsafe{
             let mut options_list = options.into_iter().map(|string| CString::new(string).unwrap().into_raw()).collect::<Vec<_>>();
 
             gdal_sys::GDALFillNodata(
                 self.c_rasterband,
-                mask.c_rasterband,
+                mask,
                 max_search_distance,
                 0 as libc::c_int,
                 num_smoothing_iterations as libc::c_int,
@@ -245,9 +245,9 @@ impl<'a> RasterBand<'a> {
         return Ok(());
 
     }
-    pub fn get_mask_band(&self) -> Self{
+    pub fn get_mask_band(&self) -> GDALRasterBandH{
         unsafe{
-            return Self::from_c_rasterband(self.dataset, gdal_sys::GDALGetMaskBand(self.c_rasterband));
+            return gdal_sys::GDALGetMaskBand(self.c_rasterband);
         }
     }
     pub fn get_statistics(&self, approx_ok: bool, force: bool) -> Result<RasterBandStatistics> {
