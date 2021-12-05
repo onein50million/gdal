@@ -245,6 +245,11 @@ impl<'a> RasterBand<'a> {
         return Ok(());
 
     }
+    pub fn get_mask_band(&self) -> Self{
+        unsafe{
+            return Self::from_c_rasterband(self.dataset, gdal_sys::GDALGetMaskBand(self.c_rasterband));
+        }
+    }
 
     pub fn get_statistics(&self, approx_ok: bool, force: bool) -> Result<RasterBandStatistics> {
         let mut result = RasterBandStatistics {
