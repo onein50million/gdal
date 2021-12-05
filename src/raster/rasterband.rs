@@ -116,6 +116,11 @@ pub struct RasterBandStatistics {
     pub standard_deviation: f64
 }
 
+pub struct DataCoverageReturn{
+    pub status: i32,
+    pub percent: f64,
+}
+
 /// Represents a single band of a dataset.
 ///
 /// This object carries the lifetime of the dataset that
@@ -223,10 +228,30 @@ impl<'a> RasterBand<'a> {
         Ok(())
     }
 
-    pub fn fill_no_data(&mut self, mask: GDALRasterBandH, max_search_distance: f64, num_smoothing_iterations: i32, options: Vec<&str>) -> Result<()>{
-        let rv = unsafe{
-            // let mut options_list = options.into_iter().map(|string| CString::new(string).unwrap().into_raw()).collect::<Vec<_>>();
+    pub fn get_data_coverage_status(&self, x_offset: i32, y_offset: i32, x_size: i32, y_size: i32) -> DataCoverageReturn{
+        let mut data_percent = 0.0;
 
+        let rv = unsafe {
+            gdal_sys::GDALGetDataCoverageStatus(
+                self.c_rasterband,
+                x_offset,
+                y_offset,
+                x_size,
+                y_size,
+                0,
+                &mut data_percent
+            )
+        };
+
+
+        return DataCoverageReturn{
+            status: rv,
+            percent: data_percent
+        }
+    }
+
+    pub fn fill_no_data(&mut self, mask: GDALRasterBandH, max_search_distance: f64, num_smoothing_iterations: i32) -> Result<()>{
+        let rv = unsafe{
             gdal_sys::GDALFillNodata(
                 self.c_rasterband,
                 mask,
