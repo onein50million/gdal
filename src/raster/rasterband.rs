@@ -223,7 +223,7 @@ impl<'a> RasterBand<'a> {
         Ok(())
     }
 
-    pub fn fill_no_data(&mut self, mask: Self, max_search_distance: f64, num_smoothing_iterations: usize, options: Vec<&str>) -> Result<()>{
+    pub fn fill_no_data(&mut self, mask: Self, max_search_distance: f64, num_smoothing_iterations: i32, options: Vec<&str>) -> Result<()>{
         let rv = unsafe{
             let mut options_list = options.into_iter().map(|string| CString::new(string).unwrap().into_raw()).collect::<Vec<_>>();
 
@@ -231,10 +231,10 @@ impl<'a> RasterBand<'a> {
                 self.c_rasterband,
                 mask.c_rasterband,
                 max_search_distance,
-                0.0 as libc::c_int,
+                0 as libc::c_int,
                 num_smoothing_iterations as libc::c_int,
                 options_list.as_mut_ptr(),
-                Some(gdal_sys::GDALDummyProgress),
+                None,
                 std::ptr::null_mut() as *mut libc::c_void
 
             )
